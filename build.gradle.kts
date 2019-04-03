@@ -82,8 +82,9 @@ tasks.all {
 
 jib {
     val projectId: String? by project
+    val repoName: String? by project
 
-    to.image = "gcr.io/$projectId/hello-micronaut"
+    to.image = "gcr.io/$projectId/$repoName"
     container {
         mainClass = application.mainClassName
         ports = listOf("8080")
