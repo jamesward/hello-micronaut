@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/javac:8'
+  entrypoint: './gradlew'
+  args: ['jibDockerBuild', '--no-daemon', '-PprojectId=$PROJECT_ID']
+images: ['gcr.io/$PROJECT_ID/hello-micronaut']
