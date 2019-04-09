@@ -91,6 +91,10 @@ jib {
     }
 }
 
+tasks.withType<ShadowJar> {
+    mergeServiceFiles()
+}
+
 tasks.create("stage") {
     dependsOn("shadowJar")
 }
