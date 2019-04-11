@@ -23,23 +23,23 @@ dependencies {
     compile(kotlin("stdlib"))
     compile(kotlin("reflect"))
 
-    compile("io.micronaut:micronaut-runtime:1.0.5")
-    compile("io.micronaut:micronaut-http-client:1.0.5")
-    compile("io.micronaut:micronaut-http-server-netty:1.0.5")
-    compile("io.micronaut:micronaut-views:1.0.5")
+    compile("io.micronaut:micronaut-runtime:1.1.0")
+    compile("io.micronaut:micronaut-http-client:1.1.0")
+    compile("io.micronaut:micronaut-http-server-netty:1.1.0")
+    compile("io.micronaut:micronaut-views:1.1.0")
     compile("ch.qos.logback:logback-classic:1.2.3")
 
     runtime("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
     runtime("org.thymeleaf:thymeleaf:3.0.11.RELEASE")
 
-    kapt("io.micronaut:micronaut-inject-java:1.0.5")
-    kapt("io.micronaut:micronaut-validation:1.0.5")
+    kapt("io.micronaut:micronaut-inject-java:1.1.0")
+    kapt("io.micronaut:micronaut-validation:1.1.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.3.21")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.1")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.1")
 
-    kaptTest("io.micronaut:micronaut-inject-java:1.0.5")
+    kaptTest("io.micronaut:micronaut-inject-java:1.1.0")
 }
 
 java {
