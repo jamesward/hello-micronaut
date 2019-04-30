@@ -1,5 +1,46 @@
 steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  volumes:
+    - name: 'gradle_wrapper'
+      path: '/root/.gradle/wrapper'
+    - name: 'gradle_caches'
+      path: '/root/.gradle/caches'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+      echo "Pulling from cache"
+      gsutil mb gs://$PROJECT_ID-build-cache/ 2>/dev/null
+      mkdir -p /root/.gradle
+      gsutil cp gs://$PROJECT_ID-build-cache/$REPO_NAME-gradle_wrapper.tgz /tmp 2>/dev/null
+      gsutil cp gs://$PROJECT_ID-build-cache/$REPO_NAME-gradle_caches.tgz /tmp 2>/dev/null
+      cd /root/.gradle
+      tar -zxf /tmp/$REPO_NAME-gradle_wrapper.tgz 2>/dev/null
+      tar -zxf /tmp/$REPO_NAME-gradle_caches.tgz 2>/dev/null
+      exit 0
 - name: 'gcr.io/cloud-builders/javac:8'
+  volumes:
+    - name: 'gradle_wrapper'
+      path: '/root/.gradle/wrapper'
+    - name: 'gradle_caches'
+      path: '/root/.gradle/caches'
   entrypoint: './gradlew'
-  args: ['jibDockerBuild', '--no-daemon', '-PprojectId=$PROJECT_ID', '-PrepoName=$REPO_NAME']
+  args: ['jibDockerBuild', '--console=plain', '--no-daemon', '-PprojectId=$PROJECT_ID', '-PrepoName=$REPO_NAME']
+- name: gcr.io/cloud-builders/gsutil
+  volumes:
+    - name: 'gradle_wrapper'
+      path: '/root/.gradle/wrapper'
+    - name: 'gradle_caches'
+      path: '/root/.gradle/caches'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+      echo "Pushing to cache"
+      cd /root/.gradle
+      tar -zcf /tmp/$REPO_NAME-gradle_caches.tgz caches
+      gsutil cp /tmp/$REPO_NAME-gradle_caches.tgz gs://$PROJECT_ID-build-cache/$REPO_NAME-gradle_caches.tgz 2>/dev/null
+      tar -zcf /tmp/$REPO_NAME-gradle_wrapper.tgz wrapper
+      gsutil cp /tmp/$REPO_NAME-gradle_wrapper.tgz gs://$PROJECT_ID-build-cache/$REPO_NAME-gradle_wrapper.tgz 2>/dev/null
+      exit 0
 images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
