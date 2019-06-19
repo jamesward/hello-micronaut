@@ -85,11 +85,7 @@ jib {
     val projectId: String? by project
     val repoName: String? by project
 
-    if (projectId != null && repoName != null)
-      to.image = "gcr.io/$projectId/$repoName"
-    else
-      to.image = "hello-micronaut"
-
+    to.image = "gcr.io/$projectId/$repoName"
     container {
         mainClass = application.mainClassName
         ports = listOf("8080")
