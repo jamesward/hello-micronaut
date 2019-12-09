@@ -59,6 +59,6 @@ tasks.withType<ShadowJar> {
     mergeServiceFiles()
 }
 
-tasks.create("stage") {
+tasks.register<DefaultTask>("stage") {
     dependsOn("shadowJar")
 }
