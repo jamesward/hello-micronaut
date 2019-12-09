@@ -1,12 +1,20 @@
-FROM adoptopenjdk/openjdk8 as builder
+FROM oracle/graalvm-ce:19.2.1 as builder
 
 WORKDIR /app
 COPY . /app
 
-RUN ./gradlew --no-daemon stage
+RUN gu install native-image
 
-FROM adoptopenjdk/openjdk8:jre
+RUN ./gradlew -i --no-daemon --console=plain distTar
+RUN tar -xvf build/distributions/hello-micronaut.tar -C build/distributions
+RUN native-image --static --no-fallback --no-server \
+      -H:IncludeResources=logback.xml -H:IncludeResources=application.properties -H:IncludeResources=assets/.* -H:IncludeResources=views/.* \
+      -H:Name=hello-micronaut \
+      -cp /app/build/distributions/hello-micronaut/lib/hello-micronaut.jar:/app/build/distributions/hello-micronaut/lib/* \
+      hello.WebAppKt
 
-COPY --from=builder /app/build/libs/hello-micronaut.jar /hello-micronaut.jar
+FROM scratch
 
-CMD ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/hello-micronaut.jar"]
+COPY --from=builder /app/hello-micronaut /app
+
+CMD ["/app"]
