@@ -21,9 +21,11 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.runtime.Micronaut
 import io.micronaut.views.View
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 fun main() {
-    Micronaut.build().packages("hello").mainClass(WebApp::class.java).start()
+    Micronaut.run(WebApp::class.java)
 }
 
 @Controller
@@ -31,8 +33,12 @@ class WebApp {
 
     @View("index")
     @Get("/")
-    fun index(): HttpResponse<Map<String, String>> {
-        return HttpResponse.ok(mapOf(Pair("name", "world")))
+    suspend fun index(): HttpResponse<Map<String, String>> {
+        // it is silly to use async here, but we do it as an example
+        val futureResponse = GlobalScope.async {
+            HttpResponse.ok(mapOf(Pair("name", "world")))
+        }
+        return futureResponse.await()
     }
 
 }
