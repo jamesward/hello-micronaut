@@ -42,5 +42,5 @@ application {
 }
 
 tasks.register<DefaultTask>("stage") {
-    dependsOn("distTar")
+    dependsOn("installDist")
 }
