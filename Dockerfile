@@ -1,4 +1,4 @@
-FROM oracle/graalvm-ce:19.2.1 as builder
+FROM oracle/graalvm-ce:20.0.0 as builder
 
 WORKDIR /app
 COPY . /app

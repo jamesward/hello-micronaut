@@ -1,7 +1,7 @@
 plugins {
     application
-    kotlin("jvm") version "1.3.61"
-    kotlin("kapt") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
+    kotlin("kapt") version "1.3.72"
 }
 
 repositories {
@@ -13,15 +13,13 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
 
-    implementation("io.micronaut:micronaut-runtime:1.2.7")
-    implementation("io.micronaut:micronaut-http-server-netty:1.2.7")
-    implementation("io.micronaut:micronaut-views:1.2.0")
+    implementation("io.micronaut:micronaut-runtime:1.3.4")
+    implementation("io.micronaut:micronaut-http-server-netty:1.3.4")
+    implementation("io.micronaut:micronaut-views-thymeleaf:1.3.1")
     implementation("ch.qos.logback:logback-classic:1.2.3")
 
-    runtimeOnly("org.thymeleaf:thymeleaf:3.0.11.RELEASE")
-
-    kapt("io.micronaut:micronaut-inject-java:1.2.7")
-    kapt("io.micronaut:micronaut-graal:1.2.7")
+    kapt("io.micronaut:micronaut-inject-java:1.3.4")
+    kapt("io.micronaut:micronaut-graal:1.3.4")
 }
 
 java {
