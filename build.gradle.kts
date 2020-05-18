@@ -56,7 +56,8 @@ tasks.register<DefaultTask>("stage") {
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
-        events(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+        events(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+        show
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showCauses = true
