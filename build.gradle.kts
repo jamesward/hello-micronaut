@@ -42,6 +42,8 @@ application {
     mainClassName = "hello.WebAppKt"
 }
 
+tasks.replace("assemble").dependsOn("installDist")
+
 tasks.register<DefaultTask>("stage") {
     dependsOn("installDist")
 }
