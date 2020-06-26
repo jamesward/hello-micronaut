@@ -2,28 +2,26 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
-    kotlin("jvm") version "1.3.70"
-    kotlin("kapt") version "1.3.70"
+    kotlin("jvm") version "1.3.72"
+    kotlin("kapt") version "1.3.72"
+    kotlin("plugin.allopen") version "1.3.72"
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7")
 
-    implementation("io.micronaut:micronaut-runtime:1.3.5")
-    implementation("io.micronaut:micronaut-http-server-netty:1.3.5")
-    implementation("io.micronaut:micronaut-views-thymeleaf:1.3.2")
+    implementation("io.micronaut:micronaut-runtime:2.0.0")
+    implementation("io.micronaut:micronaut-http-server-netty:2.0.0")
+    implementation("io.micronaut.views:micronaut-views-thymeleaf:2.0.0")
     implementation("ch.qos.logback:logback-classic:1.2.3")
 
-    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
-
-    kapt("io.micronaut:micronaut-inject-java:1.3.5")
+    kapt("io.micronaut:micronaut-inject-java:2.0.0")
 }
 
 java {
@@ -40,6 +38,31 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClassName = "hello.WebAppKt"
+}
+
+allOpen {
+    annotation("io.micronaut.aop.Around")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.processing.incremental", true)
+        arg("micronaut.processing.annotations", "hello.*")
+        arg("micronaut.processing.group", "hello")
+        arg("micronaut.processing.module", "hello")
+    }
+}
+
+tasks.withType<JavaExec> {
+    jvmArgs = listOf("-XX:TieredStopAtLevel=1", "-Dcom.sun.management.jmxremote")
+
+    if (gradle.startParameter.isContinuous) {
+        systemProperties = mapOf(
+            "micronaut.io.watch.restart" to "true",
+            "micronaut.io.watch.enabled" to "true",
+            "micronaut.io.watch.paths" to "src/main"
+        )
+    }
 }
 
 tasks.replace("assemble").dependsOn("installDist")

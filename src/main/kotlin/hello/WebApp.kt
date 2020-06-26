@@ -19,13 +19,16 @@ package hello
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.runtime.Micronaut
+import io.micronaut.runtime.Micronaut.build
 import io.micronaut.views.View
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
-fun main() {
-    Micronaut.run(WebApp::class.java)
+fun main(args: Array<String>) {
+    build()
+        .args(*args)
+        .packages("hello")
+        .start()
 }
 
 @Controller
@@ -33,12 +36,12 @@ class WebApp {
 
     @View("index")
     @Get("/")
-    suspend fun index(): HttpResponse<Map<String, String>> {
+    suspend fun index(): HttpResponse<Map<String, String>> = run {
         // it is silly to use async here, but we do it as an example
         val futureResponse = GlobalScope.async {
-            HttpResponse.ok(mapOf(Pair("name", "world")))
+            HttpResponse.ok(mapOf("name" to "world"))
         }
-        return futureResponse.await()
+        futureResponse.await()
     }
 
 }
