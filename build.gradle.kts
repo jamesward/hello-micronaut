@@ -1,25 +1,34 @@
 plugins {
-    application
-    kotlin("jvm") version "1.3.72"
-    kotlin("kapt") version "1.3.72"
+    kotlin("jvm") version "1.4.31"
+    kotlin("kapt") version "1.4.31"
+    kotlin("plugin.allopen") version "1.4.31"
+    id("io.micronaut.application") version "1.4.0"
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
+}
+
+micronaut {
+    version.set("2.3.4")
+    runtime("netty")
+    processing {
+        incremental(true)
+        annotations("hello.*")
+    }
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
+}
 
-    implementation("io.micronaut:micronaut-runtime:1.3.4")
-    implementation("io.micronaut:micronaut-http-server-netty:1.3.4")
-    implementation("io.micronaut:micronaut-views-thymeleaf:1.3.1")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-
-    kapt("io.micronaut:micronaut-inject-java:1.3.4")
-    kapt("io.micronaut:micronaut-graal:1.3.4")
+tasks.withType<io.micronaut.gradle.graalvm.NativeImageTask> {
+    args("--verbose")
+    args("--install-exit-handlers")
+    args("--static")
+    args("--libc=musl")
 }
 
 java {
@@ -34,5 +43,5 @@ tasks.compileKotlin {
 }
 
 application {
-    mainClassName = "hello.WebAppKt"
+    mainClass.set("hello.WebAppKt")
 }

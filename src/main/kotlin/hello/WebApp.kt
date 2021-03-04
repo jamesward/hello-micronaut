@@ -16,23 +16,20 @@
 
 package hello
 
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.runtime.Micronaut
-import io.micronaut.views.View
 
 fun main() {
-    Micronaut.build().packages("hello").mainClass(WebApp::class.java).start()
+    Micronaut.run()
 }
 
 @Controller
 class WebApp {
 
-    @View("index")
     @Get("/")
-    fun index(): HttpResponse<Map<String, String>> {
-        return HttpResponse.ok(mapOf(Pair("name", "world")))
+    fun index() = run {
+        "hello, world"
     }
 
 }

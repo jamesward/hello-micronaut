@@ -1,25 +1,34 @@
-FROM oracle/graalvm-ce:20.0.0-java11 as builder
+FROM ghcr.io/graalvm/graalvm-ce:21.0.0.2 as builder
 
 WORKDIR /app
 COPY . /app
 
 RUN gu install native-image
 
-RUN ./gradlew --no-daemon --console=plain distTar
-RUN tar -xvf build/distributions/hello-micronaut.tar -C build/distributions
+# BEGIN PRE-REQUISITES FOR STATIC NATIVE IMAGES FOR GRAAL
+# SEE: https://github.com/oracle/graal/blob/master/substratevm/StaticImages.md
+ARG RESULT_LIB="/staticlibs"
 
-RUN curl -L -o musl.tar.gz https://github.com/gradinac/musl-bundle-example/releases/download/v1.0/musl.tar.gz && \
-    tar -xvzf musl.tar.gz
+RUN mkdir ${RESULT_LIB} && \
+    curl -L -o musl.tar.gz https://musl.libc.org/releases/musl-1.2.1.tar.gz && \
+    mkdir musl && tar -xvzf musl.tar.gz -C musl --strip-components 1 && cd musl && \
+    ./configure --disable-shared --prefix=${RESULT_LIB} && \
+    make && make install && \
+    cp /usr/lib/gcc/x86_64-redhat-linux/8/libstdc++.a ${RESULT_LIB}/lib/
 
-RUN native-image --static --no-fallback --no-server --enable-http --enable-https \
-      -H:IncludeResources=logback.xml -H:IncludeResources=application.properties -H:IncludeResources=assets/.* -H:IncludeResources=views/.* \
-      -H:Name=hello-micronaut \
-      -H:UseMuslC=/app/bundle/ \
-      -cp /app/build/distributions/hello-micronaut/lib/hello-micronaut.jar:/app/build/distributions/hello-micronaut/lib/* \
-      hello.WebAppKt
+ENV PATH="$PATH:${RESULT_LIB}/bin"
+ENV CC="musl-gcc"
+
+RUN curl -L -o zlib.tar.gz https://zlib.net/zlib-1.2.11.tar.gz && \
+   mkdir zlib && tar -xvzf zlib.tar.gz -C zlib --strip-components 1 && cd zlib && \
+   ./configure --static --prefix=${RESULT_LIB} && \
+    make && make install
+#END PRE-REQUISITES FOR STATIC NATIVE IMAGES FOR GRAAL
+
+RUN ./gradlew --no-daemon --console=plain nativeImage
 
 FROM scratch
 
-COPY --from=builder /app/hello-micronaut /app
+COPY --from=builder /app/build/native-image/application /app
 
 CMD ["/app"]
