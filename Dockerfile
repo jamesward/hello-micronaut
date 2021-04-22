@@ -1,4 +1,4 @@
-FROM ghcr.io/graalvm/graalvm-ce:21.0.0.2 as builder
+FROM ghcr.io/graalvm/graalvm-ce:java11-21.1.0 as builder
 
 WORKDIR /app
 COPY . /app
@@ -25,7 +25,16 @@ RUN curl -L -o zlib.tar.gz https://zlib.net/zlib-1.2.11.tar.gz && \
     make && make install
 #END PRE-REQUISITES FOR STATIC NATIVE IMAGES FOR GRAAL
 
+RUN curl -L -o xz.rpm https://www.rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/xz-5.2.4-3.el8.x86_64.rpm
+RUN rpm -iv xz.rpm
+
+RUN curl -L -o upx-3.96-amd64_linux.tar.xz https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
+RUN tar -xvf upx-3.96-amd64_linux.tar.xz
+
 RUN ./gradlew --no-daemon --console=plain nativeImage
+
+RUN upx-3.96-amd64_linux/upx -7 /app/build/native-image/application
+
 
 FROM scratch
 
