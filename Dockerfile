@@ -8,12 +8,14 @@ RUN gu install native-image
 # SEE: https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/StaticImages.md
 ARG RESULT_LIB="/staticlibs"
 
+# The latest graalvm is doing much better at native images, and expects an architectureally named binary.
 RUN mkdir ${RESULT_LIB} && \
-    curl -L -o musl.tar.gz https://musl.libc.org/releases/musl-1.2.1.tar.gz && \
+    curl -L -o musl.tar.gz https://musl.libc.org/releases/musl-1.2.2.tar.gz && \
     mkdir musl && tar -xvzf musl.tar.gz -C musl --strip-components 1 && cd musl && \
     ./configure --disable-shared --prefix=${RESULT_LIB} && \
     make && make install && \
-    cp /usr/lib/gcc/x86_64-redhat-linux/8/libstdc++.a ${RESULT_LIB}/lib/
+    cp /usr/lib/gcc/x86_64-redhat-linux/8/libstdc++.a ${RESULT_LIB}/lib/ && \
+    ln -s $RESULT_LIB/bin/musl-gcc $RESULT_LIB/bin/x86_64-linux-musl-gcc
 
 ENV PATH="$PATH:${RESULT_LIB}/bin"
 ENV CC="musl-gcc"

@@ -47,8 +47,13 @@ graalvmNative {
     binaries {
         named("main") {
             verbose.set(true)
-//            buildArgs.addAll("--static", "--libc=musl", "--install-exit-handlers")
-            buildArgs.addAll("-H:+StaticExecutableWithDynamicLibC", "--install-exit-handlers")
+            buildArgs.addAll(
+                "--static",
+                "--libc=musl",
+                "--install-exit-handlers"
+            )
+            // To build a mostly static image you can use this. It *should* work on anything with a libc.
+            // buildArgs.addAll("-H:+StaticExecutableWithDynamicLibC", "--install-exit-handlers")
         }
     }
     toolchainDetection.set(false)
