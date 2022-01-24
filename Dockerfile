@@ -1,12 +1,11 @@
-FROM ghcr.io/graalvm/graalvm-ce:java11-21.1.0 as builder
+FROM ghcr.io/graalvm/graalvm-ce:java11-21.3.0 as builder
 
 WORKDIR /app
-COPY . /app
 
 RUN gu install native-image
 
 # BEGIN PRE-REQUISITES FOR STATIC NATIVE IMAGES FOR GRAAL
-# SEE: https://github.com/oracle/graal/blob/master/substratevm/StaticImages.md
+# SEE: https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/StaticImages.md
 ARG RESULT_LIB="/staticlibs"
 
 RUN mkdir ${RESULT_LIB} && \
@@ -31,13 +30,17 @@ RUN rpm -iv xz.rpm
 RUN curl -L -o upx-3.96-amd64_linux.tar.xz https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
 RUN tar -xvf upx-3.96-amd64_linux.tar.xz
 
-RUN ./gradlew --no-daemon --console=plain nativeImage
+# Don't copy the app in until much later, so we can save a lot of this build time, during development iterations.
+COPY . /app
 
-RUN upx-3.96-amd64_linux/upx -7 /app/build/native-image/application
+RUN ./gradlew --no-daemon --console=plain nativeCompile
+# this writes the app out to app/build/native/nativeCompile/hello-micronaut (name of app)
+
+RUN upx-3.96-amd64_linux/upx -7 /app/build/native/nativeCompile/hello-micronaut
 
 
 FROM scratch
 
-COPY --from=builder /app/build/native-image/application /app
+COPY --from=builder /app/build/native/nativeCompile/hello-micronaut /app
 
 CMD ["/app"]
