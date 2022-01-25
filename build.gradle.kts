@@ -11,7 +11,7 @@ repositories {
 
 micronaut {
     runtime("netty")
-    version.set("3.1.1")
+    version.set("3.2.7")
     processing {
         incremental(true)
         annotations("hello.*")
