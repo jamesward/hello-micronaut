@@ -1,15 +1,10 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.10"
-    id("org.jetbrains.kotlin.kapt") version "1.6.10"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.6.10"
-    id("com.github.johnrengelman.shadow") version "7.1.1"
+    kotlin("jvm") version "1.6.10"
+    kotlin("kapt") version "1.6.10"
+    kotlin("plugin.allopen") version "1.6.10"
     id("io.micronaut.application") version "3.1.1"
 }
 
-version = "0.1"
-group = "hello"
-
-val kotlinVersion = project.properties.get("kotlinVersion")
 repositories {
     mavenCentral()
 }
@@ -25,8 +20,8 @@ micronaut {
 
 dependencies {
     kapt("io.micronaut:micronaut-http-validation")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation(kotlin("reflect"))
+    implementation(kotlin("stdlib-jdk8"))
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
